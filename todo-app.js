@@ -38,30 +38,35 @@
         return list;
     }
 
-    function createTodoItem(task) {
-        //Создаем элементы списка
+    function createTodoItem(task, done) {
+        // Создаем элементы списка
         let item = document.createElement('li');
         let groupBtn = document.createElement('div');
         let doneBtn = document.createElement('button');
         let deleteBtn = document.createElement('button');
 
-        //Добавляем элементу списка класс bootstrap и присваем ему аргумент функции
+        // Добавляем элементу списка класс bootstrap и присваиваем ему значение из объекта
         item.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
         item.textContent = task;
 
-        //Дабавляем кнопкам взаимодействия с элементом классы bootstrap
+        // Если задача выполнена, добавляем соответствующий класс
+        if (done) {
+            item.classList.add('list-group-item-success');
+        }
+
+        // Добавляем кнопкам взаимодействия с элементом классы bootstrap
         groupBtn.classList.add('btn-group', 'btn-group-sm');
         doneBtn.classList.add('btn', 'btn-success');
         doneBtn.textContent = 'Готово';
         deleteBtn.classList.add('btn', 'btn-danger');
         deleteBtn.textContent = 'Удалить';
 
-        //Помещаем все эелементы в соответсвующие блоки
+        // Помещаем все элементы в соответствующие блоки
         groupBtn.append(doneBtn);
         groupBtn.append(deleteBtn);
         item.append(groupBtn);
 
-        //Возвращаем элементы в виде объектов
+        // Возвращаем элементы в виде объектов
         return { doneBtn, deleteBtn, item };
     }
 
@@ -80,23 +85,24 @@
             todoAppForm.button.disabled = true;
         }
 
-        todoAppForm.input.addEventListener('input', function() {
+        todoAppForm.input.addEventListener('input', function () {
             todoAppForm.button.disabled = false;
+            let itemArr = [];
 
             todoAppForm.form.addEventListener('submit', function (e) {
-    
+
                 //Сбрасываем стандартное действия браузера при отпрвке формы
                 e.preventDefault();
-    
-    
+
+
                 //Поверяем заполненность формы, если форма пустая, код не выполняется
                 if (!todoAppForm.input.value) {
                     return;
                 };
-    
-    
+
+
                 let todoItem = createTodoItem(todoAppForm.input.value);
-    
+
                 //Создаем обработчики событий для взаимодействия с задачей
                 todoItem.doneBtn.addEventListener('click', function () {
                     todoItem.item.classList.toggle('list-group-item-success');
@@ -106,11 +112,11 @@
                         todoItem.item.remove();
                     }
                 });
-    
+
                 //Помещаем задачу в список
                 todoAppList.append(todoItem.item);
 
-                
+
                 todoAppForm.input.value = ''
                 if (!todoAppForm.input.value) {
                     todoAppForm.button.disabled = true;
