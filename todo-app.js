@@ -38,11 +38,6 @@
         return list;
     }
 
-    // let task = {
-    //     name: createTodoItemForm.input.value,
-    //     done: false,
-    // }
-
     function createTodoItem(task) {
         // Создаем элементы списка
         let item = document.createElement('li');
@@ -114,13 +109,23 @@
                     todoItem.item.classList.toggle('list-group-item-success');
                     task.done = true;
                 });
+                itemArr.push(task);
+                console.log(itemArr);
                 todoItem.deleteBtn.addEventListener('click', function () {
                     if (confirm('Вы уверены?')) {
                         todoItem.item.remove();
+                        function deleteObj (arr, key, value) {
+                            for (let i = 0; i < arr.length; i++) {
+                                const obj = arr[i];
+                                if (obj[key] === value) {
+                                  arr.splice(i, 1);
+                                };
+                              };                            
+                        }
+                        deleteObj(itemArr, 'id', task.id);
+                        console.log(itemArr);
                     }
                 });
-                itemArr.push(task);
-                console.log(itemArr)
 
                 //Помещаем задачу в список
                 todoAppList.append(todoItem.item);
