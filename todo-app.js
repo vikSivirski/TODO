@@ -67,7 +67,7 @@
 
     
     //Пишем функцию создания задачи
-    function createTodoApp(container, title = 'Список задач') {
+    function createTodoApp(container, title = 'Список задач', listName) {
         let todoAppTitle = createAppTitle(title);
         let todoAppForm = createTodoItemForm();
         let todoAppList = createTodoList();
@@ -76,7 +76,7 @@
         container.append(todoAppForm.form);
         container.append(todoAppList);
         
-        //Создаем обрабтчик события отправки формы
+        //Создаем обрабтчик события отправки формы и проверяем форму на заполненность
         if (!todoAppForm.input.value) {
             todoAppForm.button.disabled = true;
         }
@@ -94,23 +94,26 @@
                 
                 //Сбрасываем стандартное действия браузера при отпрвке формы
                 e.preventDefault();
-
-
+                
+                
                 //Поверяем заполненность формы, если форма пустая, код не выполняется
                 if (!todoAppForm.input.value) {
                     return;
                 };
-
+                
                 let todoItem = createTodoItem(task.name);
                 todoItem.item.setAttribute('id', task.id);
                 
                 //Создаем обработчики событий для взаимодействия с задачей
+                
                 todoItem.doneBtn.addEventListener('click', function () {
                     todoItem.item.classList.toggle('list-group-item-success');
-                    task.done = true;
+                    if (todoItem.item.classList.contains('list-group-item-success')) {
+                        task.done = true;
+                    } else {
+                        task.done = false;
+                    }
                 });
-                itemArr.push(task);
-                console.log(itemArr);
                 todoItem.deleteBtn.addEventListener('click', function () {
                     if (confirm('Вы уверены?')) {
                         todoItem.item.remove();
@@ -118,25 +121,35 @@
                             for (let i = 0; i < arr.length; i++) {
                                 const obj = arr[i];
                                 if (obj[key] === value) {
-                                  arr.splice(i, 1);
+                                    arr.splice(i, 1);
                                 };
-                              };                            
+                            };                            
                         }
                         deleteObj(itemArr, 'id', task.id);
                         console.log(itemArr);
                     }
                 });
-
-                //Помещаем задачу в список
+                
+                
+                //Помещаем задачу в список и объект с данными задачи 
+                
                 todoAppList.append(todoItem.item);
-
+                
                 todoAppForm.input.value = ''
                 if (!todoAppForm.input.value) {
                     todoAppForm.button.disabled = true;
                 }
+                itemArr.push(task);
+                console.log(itemArr);
+                let jsonArr = JSON.stringify(itemArr);
+                console.log(jsonArr);
+
+                //загружаем JSON массив в localStorage
+
+                localStorage.setItem(listName, jsonArr);
             })
         })
-
+        
     }
 
     window.createTodoApp = createTodoApp;
