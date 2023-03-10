@@ -1,5 +1,6 @@
 (function () {
     let itemArr = [];
+    let listName = ''
     //Пишем функцию для заголовка
     function createAppTitle(title) {
         let appTitle = document.createElement('h2');
@@ -68,9 +69,35 @@
         deleteBtn.classList.add('btn', 'btn-danger');
         deleteBtn.textContent = 'Удалить';
 
+        
+        doneBtn.addEventListener('click', function () {
+            item.classList.toggle('list-group-item-success');
+            let currentId = object.id;
+            for (listItem of itemArr) {
+                if (listItem.id == currentId) {
+                    listItem.done = !listItem.done
+                }
+            }
+            saveList(itemArr, listName);
+            console.log(itemArr)
+        });
         if (object.done == true) {
             item.classList.add('list-group-item-success');
         }
+        deleteBtn.addEventListener('click', function () {
+            if (confirm('Вы уверены?')) {
+                item.remove();
+                let currentId = object.id;
+                for (let i = 0; i < itemArr.length; i++) {
+                    const obj = itemArr[i];
+                    if (obj.id === currentId) {
+                        itemArr.splice(i, 1);
+                    };
+                }; 
+                saveList(itemArr, listName);               
+                console.log(itemArr);
+            }
+        });
 
         // Помещаем все элементы в соответствующие блоки
         groupBtn.append(doneBtn);
@@ -81,12 +108,27 @@
         return { doneBtn, deleteBtn, item };
     }
 
+    function saveList (arr, keyName) {
+        let jsonArr = JSON.stringify(arr);
+        localStorage.setItem(keyName, jsonArr);
+    }
 
     //Пишем функцию создания задачи
-    function createTodoApp(container, title = 'Список задач', listName) {
+    function createTodoApp(container, title = 'Список задач', keyName) {
         let todoAppTitle = createAppTitle(title);
         let todoAppForm = createTodoItemForm();
         let todoAppList = createTodoList();
+
+        listName = keyName;
+
+        let localData = localStorage.getItem(listName);
+        if (localData !== null && localData !== '') {
+            itemArr = JSON.parse(localData);
+        }
+        for (itemList of itemArr) {
+            let todoItem = createTodoItem(itemList);
+            todoAppList.append(todoItem.item);
+        }
 
         container.append(todoAppTitle);
         container.append(todoAppForm.form);
@@ -114,33 +156,6 @@
             let todoItem = createTodoItem(task);
             todoItem.item.setAttribute('id', task.id);
 
-            //Создаем обработчики событий для взаимодействия с задачей
-
-            todoItem.doneBtn.addEventListener('click', function () {
-                todoItem.item.classList.toggle('list-group-item-success');
-                // if (todoItem.item.classList.contains('list-group-item-success')) {
-                //     task.done = true;
-                // } else {
-                //     task.done = false;
-                // }
-            });
-            todoItem.deleteBtn.addEventListener('click', function () {
-                if (confirm('Вы уверены?')) {
-                    todoItem.item.remove();
-                    function deleteObj(arr, key, value) {
-                        for (let i = 0; i < arr.length; i++) {
-                            const obj = arr[i];
-                            if (obj[key] === value) {
-                                arr.splice(i, 1);
-                            };
-                        };
-                    }
-                    deleteObj(itemArr, 'id', task.id);
-                    console.log(itemArr);
-                }
-            });
-
-
             //Помещаем задачу в список и объект с данными задачи 
 
             todoAppList.append(todoItem.item);
@@ -149,12 +164,7 @@
             todoAppForm.button.disabled = true;
             itemArr.push(task);
             console.log(itemArr);
-            let jsonArr = JSON.stringify(itemArr);
-            console.log(jsonArr);
-
-            //загружаем JSON массив в localStorage
-
-            localStorage.setItem(listName, jsonArr);
+            saveList(itemArr, listName);
         })
 
     }
